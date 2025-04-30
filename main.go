@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"go-concurrency/income"
+	producerconsumer "go-concurrency/producer-consumer"
 )
 
 var msg3 string
@@ -24,8 +25,10 @@ func updateMsg(s string, m *sync.Mutex) {
 }
 
 func main() {
-	module := "income"
+	module := "prod-cons"
 	switch module {
+	case "prod-cons":
+		producerconsumer.ProducerConsumer()
 	case "income":
 		income.IncomeCalc()
 	case "wait_group":
