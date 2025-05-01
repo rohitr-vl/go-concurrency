@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	diningphilosophers "go-concurrency/dining-philosophers"
 	"go-concurrency/income"
 	producerconsumer "go-concurrency/producer-consumer"
 )
@@ -25,8 +26,10 @@ func updateMsg(s string, m *sync.Mutex) {
 }
 
 func main() {
-	module := "prod-cons"
+	module := "din-philo"
 	switch module {
+	case "din-philo":
+		diningphilosophers.DiningPhilosophers()
 	case "prod-cons":
 		producerconsumer.ProducerConsumer()
 	case "income":
