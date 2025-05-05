@@ -1,6 +1,7 @@
 package diningphilosophers
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -23,10 +24,12 @@ var philosophers = []Philosopher{
 	{name: "Locke", leftFork: 3, rightFork: 4},
 }
 
+var timeMutex sync.Mutex
+var finishTime []string
 var hunger = 3
-var eatTime = 1 * time.Second
-var thinkTime = 0 * time.Second
-var sleepTime = 0 * time.Second
+var eatTime = 2 * time.Second
+var thinkTime = 1 * time.Second
+var sleepTime = 1 * time.Second
 
 func DiningPhilosophers() {
 	// start with empty table and no one starts to eat until all are on the table
@@ -38,6 +41,10 @@ func DiningPhilosophers() {
 
 	// finished eating
 	color.Green("The table is empty i.e. all go-routines closed")
+	color.Green("The start and end time of each philosopher is as follows:")
+	for i:=range(finishTime) {
+		fmt.Println(finishTime[i])
+	}
 }
 
 func dine() {
@@ -49,7 +56,7 @@ func dine() {
 	seated := &sync.WaitGroup{}
 	seated.Add(len(philosophers))
 
-	// map of 5 forks
+	// map of 5 mutexes to lock 5 forks
 	var forks = make(map[int]*sync.Mutex)
 	for i := 0; i < len(philosophers); i++ {
 		forks[i] = &sync.Mutex{}
@@ -66,9 +73,12 @@ func diningProblem(philosopher Philosopher, wg *sync.WaitGroup, forks map[int]*s
 	defer wg.Done()
 
 	//seat the philosopher at the table
-	color.Blue("\n %s: %s is seated at the table", helpers.GetLocalTime(), philosopher.name)
+	pName := philosopher.name
+	color.Blue("\n %s: %s is seated at the table", helpers.GetLocalTime(), pName)
 	seated.Done()
-
+	timeMutex.Lock()
+	timeInfo := pName + " - Start:" + helpers.GetLocalTime()
+	timeMutex.Unlock()
 	// eat three times
 	for i := hunger; i > 0; i-- {
 		/* logical race problem cannot be detected by "#go run -race ." command
@@ -99,6 +109,11 @@ func diningProblem(philosopher Philosopher, wg *sync.WaitGroup, forks map[int]*s
 		forks[philosopher.rightFork].Unlock()
 
 		color.Yellow(" %s: %s has put down the forks #%d & #%d", helpers.GetLocalTime(), philosopher.name, philosopher.leftFork, philosopher.rightFork)
+		time.Sleep(sleepTime)
 	}
 	color.Blue(" %s: %s has eaten and left the table \n", helpers.GetLocalTime(), philosopher.name)
+	timeMutex.Lock()
+	timeInfo += " - End:" + helpers.GetLocalTime()
+	finishTime = append(finishTime, timeInfo)
+	timeMutex.Unlock()
 }
