@@ -7,6 +7,7 @@ import (
 	diningphilosophers "go-concurrency/dining-philosophers"
 	"go-concurrency/income"
 	producerconsumer "go-concurrency/producer-consumer"
+	sleepingbarber "go-concurrency/sleeping-barber"
 )
 
 var msg3 string
@@ -26,8 +27,13 @@ func updateMsg(s string, m *sync.Mutex) {
 }
 
 func main() {
-	module := "din-philo"
+	module := "sleep-barber"
 	switch module {
+	case "sleep-barber":
+		sleepingbarber.SleepingBarber()
+		// sleepingbarber.BufferedChannels()
+		// sleepingbarber.ChannelSelect()
+		// sleepingbarber.Channels()
 	case "din-philo":
 		diningphilosophers.DiningPhilosophers()
 	case "prod-cons":
